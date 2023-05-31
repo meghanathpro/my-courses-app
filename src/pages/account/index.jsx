@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import supabase from "../../lib/supabase";
 import { useSession, useUser } from "@supabase/auth-helpers-react";
+import Header from "@/components/Header";
 
 const AccountsPage = () => {
   const session = useSession();
@@ -41,9 +42,13 @@ const AccountsPage = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
+      const updatedProfileWithTimestamp = {
+        ...updatedProfile,
+        updated_at: new Date().toISOString(),
+      };
       const { error } = await supabase
         .from("profiles")
-        .update(updatedProfile)
+        .update(updatedProfileWithTimestamp)
         .eq("user_id", session?.user.id);
       if (error) {
         throw new Error(error.message);
@@ -55,64 +60,70 @@ const AccountsPage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Account</h1>
-      {profile ? (
-        <form onSubmit={handleFormSubmit} className="max-w-md">
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 font-bold mb-2"
-              htmlFor="username"
+    <div>
+      <Header />
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8">Account</h1>
+        {profile ? (
+          <form onSubmit={handleFormSubmit} className="max-w-md">
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 font-bold mb-2"
+                htmlFor="username"
+              >
+                Username
+              </label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={updatedProfile.username}
+                onChange={handleInputChange}
+                className="p-2 border border-gray-300 rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 font-bold mb-2"
+                htmlFor="full_name"
+              >
+                Full Name
+              </label>
+              <input
+                type="text"
+                id="full_name"
+                name="full_name"
+                value={updatedProfile.full_name}
+                onChange={handleInputChange}
+                className="p-2 border border-gray-300 rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 font-bold mb-2"
+                htmlFor="bio"
+              >
+                Bio
+              </label>
+              <textarea
+                id="bio"
+                name="bio"
+                value={updatedProfile.bio}
+                onChange={handleInputChange}
+                className="p-2 border border-gray-300 rounded"
+              ></textarea>
+            </div>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-500 text-white rounded"
             >
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={updatedProfile.username}
-              onChange={handleInputChange}
-              className="p-2 border border-gray-300 rounded"
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 font-bold mb-2"
-              htmlFor="full_name"
-            >
-              Full Name
-            </label>
-            <input
-              type="text"
-              id="full_name"
-              name="full_name"
-              value={updatedProfile.full_name}
-              onChange={handleInputChange}
-              className="p-2 border border-gray-300 rounded"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="bio">
-              Bio
-            </label>
-            <textarea
-              id="bio"
-              name="bio"
-              value={updatedProfile.bio}
-              onChange={handleInputChange}
-              className="p-2 border border-gray-300 rounded"
-            ></textarea>
-          </div>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded"
-          >
-            Update Profile
-          </button>
-        </form>
-      ) : (
-        <p>Loading profile...</p>
-      )}
+              Update Profile
+            </button>
+          </form>
+        ) : (
+          <p>Loading profile...</p>
+        )}
+      </div>
     </div>
   );
 };

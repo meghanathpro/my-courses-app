@@ -46,6 +46,20 @@ const CourseCard = ({ course }) => {
     }
   }
 
+  const handleEnroll = async () => {
+    try {
+      const { error } = await supabase
+        .from("saved_courses")
+        .insert([{ user_id: supabase.auth.user().id, course_id: id }]);
+      if (error) {
+        throw new Error(error.message);
+      }
+      console.log("Course saved successfully");
+    } catch (error) {
+      console.error("Error saving course:", error.message);
+    }
+  };
+
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden">
       <div className="bg-gray-900 h-40 flex items-center justify-center">
@@ -59,6 +73,13 @@ const CourseCard = ({ course }) => {
         <p className="text-gray-700 text-sm mt-4 font-bold">
           Pricing: ${pricing}
         </p>
+
+        <button
+          className="bg-blue-500 text-white rounded-full shadow-md px-4 py-2  bottom-4 right-4"
+          onClick={handleEnroll}
+        >
+          Enroll
+        </button>
       </div>
     </div>
   );
